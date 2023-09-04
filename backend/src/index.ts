@@ -28,21 +28,21 @@ const initDb = async () => {
 initDb();
 
 const buildSimpleWhereClause = (serverId: string, q?: string, includeUser?: string, excludeUser?: string) => {
-  let whereClauses = [`server_id = ?`];
+  let whereClauses = [`images.server_id = ?`];
   let params = [serverId];
   
   if (q) {
-    whereClauses.push(`prompt LIKE ?`);
+    whereClauses.push(`images.prompt LIKE ?`);
     params.push(`%${q}%`);
   }
   
   if (includeUser) {
-    whereClauses.push(`user_id = ?`);
+    whereClauses.push(`images.user_id = ?`);
     params.push(includeUser);
   }
   
   if (excludeUser) {
-    whereClauses.push(`user_id != ?`);
+    whereClauses.push(`images.user_id != ?`);
     params.push(excludeUser);
   }
   
@@ -86,6 +86,7 @@ const runQuery = async (sql: string, params: any[], res: Response, whereClause: 
 
   try {
     const total = await getGalleryCount(whereClause, params);
+    const userCounts = await getGalleryUserCounts(whereClause, params);
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE) + 1;
     const rows = await db.all(sql, params);
 
@@ -93,11 +94,13 @@ const runQuery = async (sql: string, params: any[], res: Response, whereClause: 
       totalRecords: total,
       totalPages,
       currentPage: Number(params.slice(-1)[0] / ITEMS_PER_PAGE) + 1,
+      userCounts,
       records: rows
     }
     dbCache.setRes('GALLERY', sql, params, result);
     res.json(result);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Database error' });
   }
 };
@@ -115,6 +118,29 @@ const getGalleryCount = async (whereClause: string, params: any[]): Promise<numb
   const { total } = await db.get(`SELECT COUNT(*) as total FROM images WHERE ${whereClause}`, params.slice(0, -1));
   dbCache.setRes('GALLERY_COUNT', whereClause, params, total);
   return total;
+};
+
+const getGalleryUserCounts = async (whereClause: string, params: any[]): Promise<any[]> => {
+  const cacheKey = 'GALLERY_USER_COUNTS';
+  const paramsWithoutOffset = params.slice(0, -1);
+  const cachedData = dbCache.getRes(cacheKey, whereClause, paramsWithoutOffset);
+  if (cachedData) {
+    return cachedData;
+  }
+
+
+  const sql = `
+    SELECT users.*, COUNT(images.message_id) as image_count 
+    FROM users 
+    INNER JOIN images ON users.user_id = images.user_id AND users.server_id = images.server_id
+    WHERE ${whereClause} 
+    GROUP BY users.user_id, users.server_id
+    ORDER BY image_count DESC`;
+  
+  const rows = await db.all(sql, paramsWithoutOffset);
+  dbCache.setRes(cacheKey, whereClause, paramsWithoutOffset, rows);
+  
+  return rows;
 };
 
 
@@ -144,7 +170,8 @@ app.get('/gallery/:serverId/favorites/:userId', validateFavoritesQueryParams, as
 });
 
 const runFavoritesQuery = async (sql: string, params: any[], res: Response, userId: string, serverId: string): Promise<void> => {
-  const cachedData = dbCache.getRes('FAVORITES', sql, params);
+  const cacheKey = 'FAVORITES';
+  const cachedData = dbCache.getRes(cacheKey, sql, params);
   if (cachedData) {
     res.json(cachedData);
     return;
@@ -152,6 +179,7 @@ const runFavoritesQuery = async (sql: string, params: any[], res: Response, user
 
   try {
     const total = await getFavoritesCount(userId, serverId);
+    const userCounts = await getFavoritesUserCounts(userId, serverId);
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
     
     const rows = await db.all(sql, params);
@@ -160,17 +188,20 @@ const runFavoritesQuery = async (sql: string, params: any[], res: Response, user
       totalRecords: total,
       totalPages,
       currentPage: Number(params.slice(-1)[0] / ITEMS_PER_PAGE) + 1,
+      userCounts,
       records: rows
     }
-    dbCache.setRes('FAVORITES', sql, params, result);
+    dbCache.setRes(cacheKey, sql, params, result);
     res.json(result);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Database error' });
   }
 };
 
 const getFavoritesCount = async (userId: string, serverId: string): Promise<number> => {
-  const cachedData = dbCache.getRes('FAVORITES_COUNT', '', [userId, serverId]);
+  const cacheKey = 'FAVORITES_COUNTS';
+  const cachedData = dbCache.getRes(cacheKey, '', [userId, serverId]);
   if (cachedData) {
     return cachedData;
   }
@@ -180,9 +211,31 @@ const getFavoritesCount = async (userId: string, serverId: string): Promise<numb
   FROM images 
   INNER JOIN favorites ON images.message_id = favorites.message_id
   WHERE favorites.user_id = ? AND favorites.status = 1 AND images.server_id = ?`;
+
   const { total } = await db.get(countSql, [userId, serverId]);
-  dbCache.setRes('FAVORITES_COUNT', '', [userId, serverId], total);
+  dbCache.setRes(cacheKey, '', [userId, serverId], total);
   return total;
+};
+
+const getFavoritesUserCounts = async (userId: string, serverId: string): Promise<any[]> => {
+  const cacheKey = 'FAVORITES_USER_COUNTS';
+  const cachedData = dbCache.getRes(cacheKey, '', [userId, serverId]);
+  if (cachedData) {
+    return cachedData;
+  }
+  
+  const sql = `
+    SELECT users.*, COUNT(images.message_id) as image_count
+    FROM users
+    INNER JOIN images ON users.user_id = images.user_id AND users.server_id = images.server_id
+    INNER JOIN favorites ON images.message_id = favorites.message_id
+    WHERE favorites.user_id = ? AND favorites.status = 1 AND images.server_id = ?
+    GROUP BY users.user_id, users.server_id
+    ORDER BY image_count DESC`;
+
+  const rows = await db.all(sql, [userId, serverId]);
+  dbCache.setRes(cacheKey, '', [userId, serverId], rows);
+  return rows;
 };
 
 // Initialize server
