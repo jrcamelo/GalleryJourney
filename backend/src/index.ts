@@ -27,7 +27,15 @@ const initDb = async () => {
 };
 initDb();
 
-const buildSimpleWhereClause = (serverId: string, q?: string, includeUser?: string, excludeUser?: string) => {
+const validateQueryParams = [
+  query('page').optional().isInt({ min: 1 }).withMessage('Page must be an integer greater than 0'),
+  query('sort').optional().isIn(['recent', 'favorites']).withMessage('Sort must be either "recent" or "favorites"'),
+  query('includeUser').optional().isString().withMessage('includeUser must be a string'),
+  query('excludeUser').optional().isString().withMessage('excludeUser must be a string'),
+  query('q').optional().isString().withMessage('Query must be a string')
+];
+
+const buildGalleryWhereClause = (serverId: string, q?: string, includeUser?: string, excludeUser?: string) => {
   let whereClauses = [`images.server_id = ?`];
   let params = [serverId];
   
@@ -49,14 +57,6 @@ const buildSimpleWhereClause = (serverId: string, q?: string, includeUser?: stri
   return { whereClause: whereClauses.join(' AND '), params };
 };
 
-const validateQueryParams = [
-  query('page').optional().isInt({ min: 1 }).withMessage('Page must be an integer greater than 0'),
-  query('sort').optional().isIn(['recent', 'favorites']).withMessage('Sort must be either "recent" or "favorites"'),
-  query('includeUser').optional().isString().withMessage('includeUser must be a string'),
-  query('excludeUser').optional().isString().withMessage('excludeUser must be a string'),
-  query('q').optional().isString().withMessage('Query must be a string')
-];
-
 // Gallery endpoint
 app.get('/gallery/:serverId', validateQueryParams, async (req: Request, res: Response) => {
   const errors = validationResult(req);
@@ -67,7 +67,7 @@ app.get('/gallery/:serverId', validateQueryParams, async (req: Request, res: Res
   const { serverId } = req.params;
   const { q, page = 1, sort = 'favorites', includeUser, excludeUser } = req.query;
   
-  const { whereClause, params } = buildSimpleWhereClause(serverId, q as string, includeUser as string, excludeUser as string);
+  const { whereClause, params } = buildGalleryWhereClause(serverId, q as string, includeUser as string, excludeUser as string);
   const orderBy = sort === 'recent' ? 'timestamp DESC' : 'favorites_count DESC';
   const offset = (Number(page) - 1) * ITEMS_PER_PAGE;
   params.push(`${offset}`);
@@ -145,27 +145,50 @@ const getGalleryUserCounts = async (whereClause: string, params: any[]): Promise
 
 
 // Favorites endpoint
-app.get('/gallery/:serverId/favorites/:userId', validateFavoritesQueryParams, async (req: Request, res: Response) => {
+const buildFavoritesWhereClause = (serverId: string, userId: string, q?: string, includeUser?: string, excludeUser?: string) => {
+  let whereClauses = [`favorites.user_id = ? AND favorites.status = 1 AND images.server_id = ?`];
+  let params = [userId, serverId];
+  
+  if (q) {
+    whereClauses.push(`prompt LIKE ?`);
+    params.push(`%${q}%`);
+  }
+  
+  if (includeUser) {
+    whereClauses.push(`images.user_id = ?`);
+    params.push(includeUser);
+  }
+  
+  if (excludeUser) {
+    whereClauses.push(`images.user_id != ?`);
+    params.push(excludeUser);
+  }
+  
+  return { whereClause: whereClauses.join(' AND '), params };
+};
+
+app.get('/gallery/:serverId/favorites/:userId', validateQueryParams, async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
   
   const { serverId, userId } = req.params;
-  const { page = 1 } = req.query;
+  const { q, page = 1, sort = 'recent', includeUser, excludeUser } = req.query;
   
+  const { whereClause, params } = buildFavoritesWhereClause(serverId, userId, q as string, includeUser as string, excludeUser as string);
+  const orderBy = sort === 'recent' ? 'favorites.timestamp DESC' : 'favorites_count DESC';
   const offset = (Number(page) - 1) * ITEMS_PER_PAGE;
+  params.push(`${offset}`);
   
   const sql = `
   SELECT images.*, favorites.timestamp as favorite_timestamp
   FROM images
   INNER JOIN favorites ON images.message_id = favorites.message_id
-  WHERE favorites.user_id = ? AND favorites.status = 1 AND images.server_id = ?
-  ORDER BY favorites.timestamp DESC
-  LIMIT ${ITEMS_PER_PAGE} OFFSET ?`;	
-  
-  const params = [userId, serverId, offset];
-  
+  WHERE ${whereClause}
+  ORDER BY ${orderBy}
+  LIMIT ${ITEMS_PER_PAGE} OFFSET ?`;
+
   await runFavoritesQuery(sql, params, res, userId, serverId);
 });
 
