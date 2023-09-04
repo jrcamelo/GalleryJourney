@@ -85,7 +85,7 @@ const runQuery = async (sql: string, params: any[], res: Response, whereClause: 
   }
 
   try {
-    const { total } = await db.get(`SELECT COUNT(*) as total FROM images WHERE ${whereClause}`, params.slice(0, -1));
+    const total = await getGalleryCount(whereClause, params);
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE) + 1;
     const rows = await db.all(sql, params);
 
@@ -105,6 +105,18 @@ const runQuery = async (sql: string, params: any[], res: Response, whereClause: 
 const validateFavoritesQueryParams = [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be an integer greater than 0')
 ];
+
+const getGalleryCount = async (whereClause: string, params: any[]): Promise<number> => {
+  const cachedData = dbCache.getRes('GALLERY_COUNT', whereClause, params);
+  if (cachedData) {
+    return cachedData;
+  }
+  
+  const { total } = await db.get(`SELECT COUNT(*) as total FROM images WHERE ${whereClause}`, params.slice(0, -1));
+  dbCache.setRes('GALLERY_COUNT', whereClause, params, total);
+  return total;
+};
+
 
 // Favorites endpoint
 app.get('/gallery/:serverId/favorites/:userId', validateFavoritesQueryParams, async (req: Request, res: Response) => {
@@ -139,13 +151,7 @@ const runFavoritesQuery = async (sql: string, params: any[], res: Response, user
   }
 
   try {
-    const countSql = `
-      SELECT COUNT(*) as total 
-      FROM images 
-      INNER JOIN favorites ON images.message_id = favorites.message_id
-      WHERE favorites.user_id = ? AND favorites.status = 1 AND images.server_id = ?`;
-
-    const { total } = await db.get(countSql, [userId, serverId]);
+    const total = await getFavoritesCount(userId, serverId);
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
     
     const rows = await db.all(sql, params);
@@ -161,6 +167,22 @@ const runFavoritesQuery = async (sql: string, params: any[], res: Response, user
   } catch (err) {
     res.status(500).json({ error: 'Database error' });
   }
+};
+
+const getFavoritesCount = async (userId: string, serverId: string): Promise<number> => {
+  const cachedData = dbCache.getRes('FAVORITES_COUNT', '', [userId, serverId]);
+  if (cachedData) {
+    return cachedData;
+  }
+  
+  const countSql = `
+  SELECT COUNT(*) as total 
+  FROM images 
+  INNER JOIN favorites ON images.message_id = favorites.message_id
+  WHERE favorites.user_id = ? AND favorites.status = 1 AND images.server_id = ?`;
+  const { total } = await db.get(countSql, [userId, serverId]);
+  dbCache.setRes('FAVORITES_COUNT', '', [userId, serverId], total);
+  return total;
 };
 
 // Initialize server
