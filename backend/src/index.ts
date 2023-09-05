@@ -53,7 +53,7 @@ app.get('/gallery/:serverId', validateQueryParams, async (req: Request, res: Res
   
   const { serverId } = req.params;
   const { q, page = 1, sort = 'favorites', includeUser, excludeUser } = req.query;
-  const orderBy = sort === 'recent' ? 'timestamp DESC' : 'favorites_count DESC';
+  const orderBy = sort === 'recent' ? 'timestamp DESC' : 'favorites_count DESC, timestamp DESC';
   const offset = (Number(page) - 1) * ITEMS_PER_PAGE;
 
   const { whereClause, params } = buildWhereClause({
@@ -61,7 +61,12 @@ app.get('/gallery/:serverId', validateQueryParams, async (req: Request, res: Res
   });
   params.push(`${offset}`);
 
-  const sql = `SELECT * FROM images WHERE ${whereClause} ORDER BY ${orderBy} LIMIT ${ITEMS_PER_PAGE} OFFSET ?`;
+  const sql = `
+    SELECT images.*, users.username, users.avatar FROM images
+    INNER JOIN users ON images.user_id = users.user_id AND images.server_id = users.server_id
+    WHERE ${whereClause}
+    ORDER BY ${orderBy}
+    LIMIT ${ITEMS_PER_PAGE} OFFSET ?`;
   await runQuery(sql, whereClause, params, res, 'GALLERY');
 });
 
@@ -74,7 +79,7 @@ app.get('/gallery/:serverId/favorites/:userId', validateQueryParams, async (req:
   
   const { serverId, userId } = req.params;
   const { q, page = 1, sort = 'favorites', includeUser, excludeUser } = req.query;
-  const orderBy = sort === 'recent' ? 'favorites.timestamp DESC' : 'favorites_count DESC';
+  const orderBy = sort === 'recent' ? 'favorites.timestamp DESC' : 'favorites_count DESC, favorites.timestamp DESC';
   const offset = (Number(page) - 1) * ITEMS_PER_PAGE;
 
   const { whereClause, params } = buildWhereClause({
@@ -83,12 +88,13 @@ app.get('/gallery/:serverId/favorites/:userId', validateQueryParams, async (req:
   params.push(`${offset}`);
 
   const sql = `
-  SELECT images.*, favorites.timestamp as favorite_timestamp
-  FROM images
-  INNER JOIN favorites ON images.message_id = favorites.message_id
-  WHERE ${whereClause}
-  ORDER BY ${orderBy}
-  LIMIT ${ITEMS_PER_PAGE} OFFSET ?`;
+    SELECT images.*, favorites.timestamp as favorite_timestamp, users.username, users.avatar
+    FROM images
+    INNER JOIN favorites ON images.message_id = favorites.message_id
+    INNER JOIN users ON images.user_id = users.user_id AND images.server_id = users.server_id
+    WHERE ${whereClause}
+    ORDER BY ${orderBy}
+    LIMIT ${ITEMS_PER_PAGE} OFFSET ?`;
   await runQuery(sql, whereClause, params, res, 'FAVORITES');
 });
 
@@ -111,14 +117,14 @@ const buildWhereClause = ({ serverId, userId, q, includeUser, excludeUser, featu
   }
 
   if (includeUser) {
-    const includedUsers = includeUser.split(',');
-    whereClauses.push(`images.user_id IN (${includedUsers.map(() => '?').join(',')})`);
+    const includedUsers: string[] = includeUser.split(',');
+    whereClauses.push(`users.username IN (${includedUsers.map(() => '?').join(',')})`);
     params.push(...includedUsers);
-  }
+  }  
 
   if (excludeUser) {
-    const excludedUsers = excludeUser.split(',');
-    whereClauses.push(`images.user_id NOT IN (${excludedUsers.map(() => '?').join(',')})`);
+    const excludedUsers: string[] = excludeUser.split(',');
+    whereClauses.push(`user.username NOT IN (${excludedUsers.map(() => '?').join(',')})`);
     params.push(...excludedUsers);
   }
   
@@ -133,6 +139,7 @@ const runQuery = async (sql: string, whereClause: string, params: any[], res: Re
   }
   
   try {
+    console.debug(whereClause, params);
     const total = await getTotalCount(featureType, whereClause, params);
     const userCounts = await getUserCounts(featureType, whereClause, params);
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
@@ -164,7 +171,11 @@ const getTotalCount = async (featureType: string, whereClause: string, params: a
   if (featureType === 'FAVORITES') {
     extraJoin = "INNER JOIN favorites ON images.message_id = favorites.message_id"
   }
-  const sql = `SELECT COUNT(*) as total FROM images ${extraJoin} WHERE ${whereClause}`;
+  const sql = `
+    SELECT COUNT(*) as total FROM images
+    INNER JOIN users ON images.user_id = users.user_id AND images.server_id = users.server_id
+    ${extraJoin} 
+    WHERE ${whereClause}`;
 
   const { total } = await db.get(sql, params.slice(0, -1));
   dbCache.setRes(`${featureType}_COUNT`, whereClause, params, total);
