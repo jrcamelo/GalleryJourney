@@ -13,8 +13,14 @@ import Cache from './cache';
 const ITEMS_PER_PAGE = 24;
 
 const app = express();
-app.use(cors());
 app.use(express.json());
+
+const CORS_WHITELIST = [process.env.FRONTEND_URL, process.env.FRONTEND_URL_LOCAL];
+app.use(cors({
+  origin: (origin, callback) =>
+    callback(null, !origin || CORS_WHITELIST.includes(origin)),
+  credentials: true
+}));
 
 const dbCache = new Cache();
 let db: Database
@@ -63,7 +69,7 @@ app.get('/gallery/:serverId', validateQueryParams, async (req: Request, res: Res
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  
+
   const { serverId } = req.params;
   if (!serverIdsHash[serverId]) {
     return res.status(400).json({ error: 'Invalid server ID' });
@@ -93,7 +99,7 @@ app.get('/gallery/:serverId/favorites/:userId', validateQueryParams, async (req:
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  
+
   const { serverId, userId } = req.params;
   if (!serverIdsHash[serverId] || !userIdsHash[userId]) {
     return res.status(400).json({ error: 'Invalid ID' });
@@ -141,14 +147,14 @@ const buildWhereClause = ({ serverId, userId, q, includeUser, excludeUser, featu
     const includedUsers: string[] = includeUser.split(',');
     whereClauses.push(`users.username IN (${includedUsers.map(() => '?').join(',')})`);
     params.push(...includedUsers);
-  }  
+  }
 
   if (excludeUser) {
     const excludedUsers: string[] = excludeUser.split(',');
     whereClauses.push(`user.username NOT IN (${excludedUsers.map(() => '?').join(',')})`);
     params.push(...excludedUsers);
   }
-  
+
   return { whereClause: whereClauses.join(' AND '), params };
 };
 
@@ -158,15 +164,15 @@ const runQuery = async (sql: string, whereClause: string, params: any[], res: Re
     res.json(cachedData);
     return;
   }
-  
+
   try {
     console.debug(whereClause, params);
     const total = await getTotalCount(featureType, whereClause, params);
     const userCounts = await getUserCounts(featureType, whereClause, params);
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
-    
+
     const rows = await db.all(sql, params);
-    
+
     const result = {
       totalRecords: total,
       totalPages,
@@ -187,7 +193,7 @@ const getTotalCount = async (featureType: string, whereClause: string, params: a
   if (cachedData) {
     return cachedData;
   }
-  
+
   let extraJoin = ''
   if (featureType === 'FAVORITES') {
     extraJoin = "INNER JOIN favorites ON images.message_id = favorites.message_id"
@@ -222,7 +228,7 @@ const getUserCounts = async (featureType: string, whereClause: string, params: a
     WHERE ${whereClause} 
     GROUP BY users.user_id, users.server_id
     ORDER BY image_count DESC`;
-  
+
   const rows = await db.all(sql, paramsWithoutOffset);
   dbCache.setRes(`${featureType}_USER_COUNTS`, whereClause, paramsWithoutOffset, rows);
   return rows;
