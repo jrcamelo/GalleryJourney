@@ -10,7 +10,7 @@ import { validationResult, query } from 'express-validator';
 
 import Cache from './cache';
 
-const ITEMS_PER_PAGE = 50;
+const ITEMS_PER_PAGE = 24;
 
 const app = express();
 app.use(cors());
@@ -25,7 +25,20 @@ const initDb = async () => {
   });
   console.log('Connected to the SQLite database.');
 };
-initDb();
+
+const serverIdsHash: { [key: string]: boolean } = {};
+const userIdsHash: { [key: string]: boolean } = {};
+initDb().then(async () => {
+  const serverIds = await db.all('SELECT DISTINCT server_id FROM images');
+  serverIds.forEach(({ server_id }) => serverIdsHash[server_id] = true);
+  const userIds = await db.all('SELECT DISTINCT user_id FROM favorites');
+  userIds.forEach(({ user_id }) => userIdsHash[user_id] = true);
+
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+});
 
 const validateQueryParams = [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be an integer greater than 0'),
@@ -52,6 +65,10 @@ app.get('/gallery/:serverId', validateQueryParams, async (req: Request, res: Res
   }
   
   const { serverId } = req.params;
+  if (!serverIdsHash[serverId]) {
+    return res.status(400).json({ error: 'Invalid server ID' });
+  };
+
   const { q, page = 1, sort = 'favorites', includeUser, excludeUser } = req.query;
   const orderBy = sort === 'recent' ? 'timestamp DESC' : 'favorites_count DESC, timestamp DESC';
   const offset = (Number(page) - 1) * ITEMS_PER_PAGE;
@@ -78,6 +95,10 @@ app.get('/gallery/:serverId/favorites/:userId', validateQueryParams, async (req:
   }
   
   const { serverId, userId } = req.params;
+  if (!serverIdsHash[serverId] || !userIdsHash[userId]) {
+    return res.status(400).json({ error: 'Invalid ID' });
+  };
+
   const { q, page = 1, sort = 'favorites', includeUser, excludeUser } = req.query;
   const orderBy = sort === 'recent' ? 'favorites.timestamp DESC' : 'favorites_count DESC, favorites.timestamp DESC';
   const offset = (Number(page) - 1) * ITEMS_PER_PAGE;
@@ -206,9 +227,3 @@ const getUserCounts = async (featureType: string, whereClause: string, params: a
   dbCache.setRes(`${featureType}_USER_COUNTS`, whereClause, paramsWithoutOffset, rows);
   return rows;
 };
-
-// Initialize server
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
