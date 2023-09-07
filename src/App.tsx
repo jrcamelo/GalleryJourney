@@ -7,8 +7,8 @@ const App: React.FC = () => {
     <Router>
       <div>
         <Routes>
-          <Route path="/gallery/:serverId" element={<Gallery />} />
-          <Route path="/" element={<Navigate to={`/gallery/${process.env.REACT_APP_DEFAULT_SERVER}`} replace />} />
+          <Route path="/:serverId" element={<Gallery />} />
+          <Route path="/" element={<Navigate to={`/${process.env.REACT_APP_DEFAULT_SERVER}`} replace />} />
         </Routes>
       </div>
     </Router>
