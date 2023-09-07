@@ -1,4 +1,5 @@
 import React from 'react';
+import './ImageCard.css';
 
 interface ImageData {
   message_id: string;
