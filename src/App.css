@@ -190,26 +190,34 @@ body {
   grid-column: 2 / span 1;
 }
 
-.info-container {
-  display: flex;
-  align-items: center;
-  padding: 0.5em;
-}
-
 .avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
   margin-right: 0.5em;
+  flex-shrink: 0;
+}
+
+.info-container {
+  display: flex;
+  align-items: center;
+  padding: 0.5em;
+  vertical-align: middle;
+  margin-top: 5px;
 }
 
 .prompt {
   color: #CCC;
   flex-grow: 1;
-  margin: 0;
+  margin: 0 1em 0 1em;
   font-size: 1em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;  /* Limit text to 2 lines */
+  -webkit-box-orient: vertical;
+  max-width: calc(100%);
 }
-
 
 /* Pagination Styles */
 .pagination-container {
