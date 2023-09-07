@@ -23,8 +23,7 @@ interface Props {
   data: ImageData;
 }
 
-const DEFAULT_DISCORD_AVATAR = 'https://discord.com/assets/322c936a8c8be1b803cd94861bdfa868.png';
-
+const DEFAULT_DISCORD_AVATAR = import.meta.env.VITE_DEFAULT_DISCORD_AVATAR;
 const ImageCard: React.FC<Props> = ({ data }) => {
   return (
     <div className="image-card">

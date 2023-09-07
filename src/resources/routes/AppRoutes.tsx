@@ -1,14 +1,19 @@
-import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import {
+  Navigate,
+  BrowserRouter,
+  Route,
+  Routes,
+} from "react-router-dom";
 import Gallery from '../../components/Gallery';
 import { FC } from 'react';
 
 export const AppRoutes: FC = () => {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
-        <Route path="/:serverId" element={<Gallery />} />
-        <Route path="/" element={<Navigate to={`/${process.env.REACT_APP_DEFAULT_SERVER}`} replace />} />
+        <Route path="/server/:serverId" element={<Gallery />} />
+        <Route path="/server/" element={<Navigate to={`/${import.meta.env.VITE_DEFAULT_SERVER}`} replace />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 };
