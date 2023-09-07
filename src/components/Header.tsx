@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './Header.css';
 
 interface HeaderProps {
   setSearchQuery: React.Dispatch<React.SetStateAction<string | null>>;
