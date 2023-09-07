@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchGallery } from '../services/api';
+import { fetchGallery } from '../services/gallery';
 import ImageCard from './ImageCard';
 import Pagination from './Pagination';
 import { useParams } from 'react-router-dom';
@@ -23,7 +23,7 @@ const Gallery: React.FC = () => {
         setTotalPages(data.totalPages);
         setError(null);
       } catch (err: any) {
-        setError(err.message || "An error occurred.");
+        setError(err.message || 'An error occurred.');
       }
     };
     fetchData();
@@ -32,11 +32,9 @@ const Gallery: React.FC = () => {
   return (
     <div className="container">
       <Header setSearchQuery={setSearchQuery} setSort={setSort} setCurrentPage={setCurrentPage} />
-      
+
       {error ? (
-        <div className="error">
-          {error}
-        </div>
+        <div className="error">{error}</div>
       ) : (
         <div className="gallery">
           {images.map((image: any) => (
