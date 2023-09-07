@@ -34,7 +34,12 @@ const ImageCard: React.FC<Props> = ({ data }) => {
         <img className="main-image4" src={data.url4} alt={data.prompt} />
       </div>
       <div className="info-container">
-        <img className="avatar" src={data.avatar || DEFAULT_DISCORD_AVATAR} alt={`${data.username}'s avatar`} title={`${data.username}`} />
+        <img
+          className="avatar"
+          src={data.avatar || DEFAULT_DISCORD_AVATAR}
+          alt={`${data.username}'s avatar`}
+          title={`${data.username}`}
+        />
         <p className="prompt">{data.prompt}</p>
       </div>
     </div>

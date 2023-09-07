@@ -17,20 +17,17 @@ const Pagination: React.FC<Props> = ({ currentPage, setCurrentPage, totalPages }
     <div className="pagination-container">
       {start > 1 && (
         <>
-          <button
-            className="pagination-button"
-            onClick={() => setCurrentPage(1)}
-          >
+          <button className="pagination-button" onClick={() => setCurrentPage(1)}>
             1
           </button>
           <span>&nbsp; ... &nbsp;</span>
         </>
       )}
 
-      {pageNumbers.map((num) => (
+      {pageNumbers.map(num => (
         <button
           key={num}
-          className={`pagination-button ${num === currentPage ? "pagination-button--current" : ""}`}
+          className={`pagination-button ${num === currentPage ? 'pagination-button--current' : ''}`}
           disabled={num === currentPage}
           onClick={() => setCurrentPage(num)}
         >
@@ -42,7 +39,7 @@ const Pagination: React.FC<Props> = ({ currentPage, setCurrentPage, totalPages }
         <>
           <span>&nbsp; ... &nbsp;</span>
           <button
-            className={`pagination-button ${totalPages === currentPage ? "pagination-button--current" : ""}`}
+            className={`pagination-button ${totalPages === currentPage ? 'pagination-button--current' : ''}`}
             disabled={totalPages === currentPage}
             onClick={() => setCurrentPage(totalPages)}
           >

@@ -20,7 +20,7 @@ const Header: React.FC<HeaderProps> = ({ setSearchQuery, setSort, setCurrentPage
       setSearchQuery(query);
     }
   };
-  
+
   return (
     <>
       <div className="header-container">
@@ -29,31 +29,27 @@ const Header: React.FC<HeaderProps> = ({ setSearchQuery, setSort, setCurrentPage
             type="text"
             placeholder="Search for a prompt"
             aria-label="Search Images"
-            onChange={(e) => resetPageAndSearch(e.target.value)}
-            onKeyPress={(e) => {
+            onChange={e => resetPageAndSearch(e.target.value)}
+            onKeyPress={e => {
               if (e.key === 'Enter') {
                 resetPageAndSearch(e.currentTarget.value);
               }
             }}
           />
-          <button
-            className="search-button"
-            aria-label="Perform Search"
-            onClick={() => resetPageAndSearch()}
-          >
+          <button className="search-button" aria-label="Perform Search" onClick={() => resetPageAndSearch()}>
             Search
           </button>
         </div>
         <div className="controls">
-          <button 
-            aria-label="Sort by Most Recent" 
+          <button
+            aria-label="Sort by Most Recent"
             onClick={() => handleSort('recent')}
             className={activeSort === 'recent' ? 'active' : ''}
           >
             Recent
           </button>
-          <button 
-            aria-label="Sort by Most Favorited" 
+          <button
+            aria-label="Sort by Most Favorited"
             onClick={() => handleSort('favorites')}
             className={activeSort === 'favorites' ? 'active' : ''}
           >
