@@ -1,38 +1,251 @@
-.App {
-  text-align: center;
+body {
+  background-color: #0c0c0c;
+  margin: 0;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Main Container */
+.container {
+  margin: auto;
+  color: #FFFFFF;
+  font-family: Arial, sans-serif;
+  padding: 24px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Header Styles */
+/* Search bar and controls */
+.header-container {
   display: flex;
-  flex-direction: column;
+  padding: 0.8em;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  flex-grow: 3;
+}
+
+.search-bar input {
+  flex-grow: 1;
+  padding: 0.8em 1em;
+  border: none;
+  border-top-left-radius: 24px;
+  border-bottom-left-radius: 24px;
+  outline: none;
+  background-color: #222;
+  color: #FFF;
+}
+
+.search-bar input:focus {
+  background-color: #eeeeee;
+  color: #000;
+  font-weight: bold;
+}
+
+/* Search button */
+/* TODO: Buttons break on phone, fix this somehow */
+.search-button {
+  flex-grow: 0.1;
+  margin-left: 0; 
+  margin-right: 0.5em;
+  padding: 0.8em 1em;
+  border: none;
+  border-top-right-radius: 24px;
+  border-bottom-right-radius: 24px;
+  background-color: #222;
+  color: white;
+  cursor: pointer;
+}
+
+.search-button:hover {
+  background-color: #555;
+}
+
+.controls button {
+  flex-grow: 0.5;
+  padding: 0.8em 1em;
+  border: none;
+  border-radius: 0;
+  background-color: #222;
+  cursor: pointer;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.controls button:first-child {
+  border-top-left-radius: 24px;
+  border-bottom-left-radius: 24px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.controls button:last-child {
+  border-top-right-radius: 24px;
+  border-bottom-right-radius: 24px;
+}
+
+.controls button:hover {
+  background-color: #555;
+  color: white;
+}
+
+.controls button.active {
+  background: #ccc;
+  color: black;
+}
+
+/* Gallery Styles */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);  /* Start with 4 images for ultrawide */
+  gap: 1.25em;
+}
+
+@media (max-width: 1920px) {
+  .gallery {
+    grid-template-columns: repeat(3, 1fr);  /* 3 images for medium screens */
   }
-  to {
-    transform: rotate(360deg);
+}
+
+@media (max-width: 1200px) {
+  .gallery {
+    grid-template-columns: repeat(2, 1fr);  /* 2 images for small screens */
   }
+}
+
+@media (max-width: 720px) {
+  .gallery {
+    grid-template-columns: repeat(1, 1fr);  /* 1 image for phones */
+  }
+}
+
+/* Image Card Styles */
+.image-card {
+  background-color: #282828;
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 6px;
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+  position: relative;
+}
+
+.image-card:hover {
+  transform: scale(1.07);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.image-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 0.2em;
+  position: relative;
+  width: 100%;
+}
+
+.image-container::before {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+
+/* Place Items */
+.main-image1, .main-image2, .main-image3, .main-image4 {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+  transition: transform 0.1s ease-in-out;
+}
+
+.main-image1:hover, .main-image2:hover, .main-image3:hover, .main-image4:hover {
+  transform: scale(1.07);
+  transition: transform 0.1s ease-in-out;
+  z-index: 1;
+  overflow: visible;
+  position: absolute;
+  object-fit: scale-down;
+}
+
+.main-image1 {
+  grid-row: 1 / span 1;
+  grid-column: 1 / span 1;
+}
+
+.main-image2 {
+  grid-row: 1 / span 1;
+  grid-column: 2 / span 1;
+}
+
+.main-image3 {
+  grid-row: 2 / span 1;
+  grid-column: 1 / span 1;
+}
+
+.main-image4 {
+  grid-row: 2 / span 1;
+  grid-column: 2 / span 1;
+}
+
+.info-container {
+  display: flex;
+  align-items: center;
+  padding: 0.5em;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 0.5em;
+}
+
+.prompt {
+  color: #CCC;
+  flex-grow: 1;
+  margin: 0;
+  font-size: 1em;
+}
+
+
+/* Pagination Styles */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1em;
+  width: 100%;
+}
+
+.pagination-button {
+  background-color: #222;
+  color: #FFF;
+  border: none;
+  padding: 0.5em 1em;
+  margin: 0 0.2em;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.pagination-button--disabled{
+  cursor: not-allowed;
+  background-color: #0c0c0c;
+  color: #555;
+}
+
+.pagination-button--current {
+  font-weight: bold;
+  background-color: #555;
+  color: #FFF;
+}
+
+.pagination-button:hover {
+  background-color: #666;
+}
+
+.pagination-button--disabled:hover {
+  background-color: #0c0c0c;
 }
