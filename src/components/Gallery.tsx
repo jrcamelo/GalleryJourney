@@ -4,6 +4,7 @@ import ImageCard from './ImageCard';
 import Pagination from './Pagination';
 import { useParams } from 'react-router-dom';
 import Header from './Header';
+import './Gallery.css';
 
 const Gallery: React.FC = () => {
   const { serverId } = useParams<{ serverId: string }>();
