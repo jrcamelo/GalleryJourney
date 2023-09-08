@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './Header.css';
+import SvgIcon from './SvgIcon';
 
 interface HeaderProps {
   setSearchQuery: React.Dispatch<React.SetStateAction<string | null>>;
@@ -38,7 +39,7 @@ const Header: React.FC<HeaderProps> = ({ setSearchQuery, setSort, setCurrentPage
             }}
           />
           <button className="search-button" aria-label="Perform Search" onClick={() => resetPageAndSearch()}>
-            Search
+            <SvgIcon name="search" />
           </button>
         </div>
         <div className="controls">
