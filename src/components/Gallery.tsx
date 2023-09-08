@@ -28,6 +28,8 @@ const Gallery: React.FC = () => {
       }
     };
     fetchData();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentPage, sort, searchQuery]);
 
   return (
