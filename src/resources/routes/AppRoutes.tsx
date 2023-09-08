@@ -12,7 +12,7 @@ export const AppRoutes: FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/server/:serverId" element={<Gallery />} />
-        <Route path="/server/" element={<Navigate to={`/${import.meta.env.VITE_DEFAULT_SERVER}`} replace />} />
+        <Route path="/" element={<Navigate to={`/server/${import.meta.env.VITE_DEFAULT_SERVER}`} replace/>} />
       </Routes>
     </BrowserRouter>
   );
