@@ -10,7 +10,8 @@ import { validationResult, query } from 'express-validator';
 
 import Cache from './cache';
 
-const ITEMS_PER_PAGE = 24;
+// Make this a request parameter
+const ITEMS_PER_PAGE = 12;
 
 const app = express();
 app.use(express.json());
