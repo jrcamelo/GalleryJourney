@@ -10,10 +10,8 @@
 }
 
 .image-card:hover {
-  transform: scale(1.07);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: transform 0.2s ease-in-out;
 }
 
 .image-container {
@@ -37,12 +35,12 @@
   height: 100%;
   object-fit: cover;
   border-radius: 4px;
-  transition: transform 0.1s ease-in-out;
+  transition: transform 0.2s ease-in-out;
+  z-index: 0;
 }
 
 .main-image1:hover, .main-image2:hover, .main-image3:hover, .main-image4:hover {
-  transform: scale(1.07);
-  transition: transform 0.1s ease-in-out;
+  transition: transform 0.2s ease-in-out;
   z-index: 1;
   overflow: visible;
   position: absolute;
@@ -67,6 +65,22 @@
 .main-image4 {
   grid-row: 2 / span 1;
   grid-column: 2 / span 1;
+}
+
+.main-image1:hover {
+  transform: scale(1.54) translate(17%, 17%);
+}
+
+.main-image2:hover {
+  transform: scale(1.54) translate(-17%, 17%);
+}
+
+.main-image3:hover {
+  transform: scale(1.54) translate(17%, -17%);
+}
+
+.main-image4:hover {
+  transform: scale(1.54) translate(-17%, -17%);
 }
 
 .avatar {
@@ -95,5 +109,4 @@
   display: -webkit-box;
   -webkit-line-clamp: 2;  /* Limit text to 2 lines */
   -webkit-box-orient: vertical;
-  max-width: calc(100%);
 }

@@ -14,7 +14,7 @@ body {
 .gallery {
   display: grid;
   grid-template-columns: repeat(4, 1fr);  /* Start with 4 images for ultrawide */
-  gap: 1.25em;
+  gap: 2em;
 }
 
 @media (max-width: 1920px) {
