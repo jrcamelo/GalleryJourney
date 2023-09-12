@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+  database = "sqlite"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_PRISMA_URL")
+}
+
+model Image {
+  messageId      String   @id @map("message_id")
+  serverId       String   @map("server_id")
+  channelId      String   @map("channel_id")
+  userId         String   @map("user_id")
+  prompt         String?
+  responseId     String?  @map("response_id")
+  url            String?
+  url1           String?
+  url2           String?
+  url3           String?
+  url4           String?
+  timestamp      DateTime @default(now()) @map("timestamp")
+  favoritesCount Int      @default(0) @map("favorites_count")
+
+  user              User               @relation(fields: [userId, serverId], references: [userId, serverId])
+  favorites         Favorite[]
+  channelPreference ChannelPreference? @relation(fields: [serverId, channelId], references: [serverId, channelId])
+
+  @@unique([messageId, userId, serverId])
+  @@index([serverId, channelId])
+}
+
+model User {
+  userId     String  @map("user_id")
+  serverId   String  @map("server_id")
+  imageCount Int     @default(0) @map("image_count")
+  username   String
+  avatar     String?
+
+  images    Image[]
+  favorites Favorite[]
+
+  @@id([userId, serverId])
+  @@index([serverId])
+}
+
+model Favorite {
+  userId    String   @map("user_id")
+  serverId  String   @map("server_id")
+  messageId String   @map("message_id")
+  status    Int      @default(1)
+  timestamp DateTime @default(now())
+
+  image Image @relation(fields: [messageId, userId, serverId], references: [messageId, userId, serverId])
+  user  User  @relation(fields: [userId, serverId], references: [userId, serverId])
+
+  @@id([userId, serverId, messageId])
+}
+
+model ChannelPreference {
+  serverId      String   @map("server_id")
+  channelId     String   @map("channel_id")
+  showInGallery Boolean? @default(true) @map("show_in_gallery")
+
+  images Image[]
+
+  @@id([serverId, channelId])
+}
