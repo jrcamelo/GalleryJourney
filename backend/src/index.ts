@@ -8,7 +8,7 @@ import sqlite3 from 'sqlite3';
 import cors from 'cors';
 import { validationResult, query } from 'express-validator';
 
-import Cache from './cache';
+import Cache from './SimpleCache';
 
 // Make this a request parameter
 const ITEMS_PER_PAGE = 12;
