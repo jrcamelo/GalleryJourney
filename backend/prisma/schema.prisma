@@ -9,40 +9,40 @@ datasource db {
 }
 
 model Image {
-  messageId      String   @id @map("message_id")
-  serverId       String   @map("server_id")
-  channelId      String   @map("channel_id")
-  userId         String   @map("user_id")
-  prompt         String?
-  responseId     String?  @map("response_id")
-  url            String?
-  url1           String?
-  url2           String?
-  url3           String?
-  url4           String?
-  timestamp      DateTime @default(now()) @map("timestamp")
-  favoritesCount Int      @default(0) @map("favorites_count")
-
-  user              User               @relation(fields: [userId, serverId], references: [userId, serverId])
+  messageId         String             @id @map("message_id")
+  serverId          String             @map("server_id")
+  channelId         String             @map("channel_id")
+  userId            String             @map("user_id")
+  prompt            String?
+  responseId        String?            @map("response_id")
+  url               String?
+  url1              String?
+  url2              String?
+  url3              String?
+  url4              String?
+  timestamp         DateTime           @default(now()) @map("timestamp")
+  favoritesCount    Int                @default(0) @map("favorites_count")
   favorites         Favorite[]
+  user              User               @relation(fields: [userId, serverId], references: [userId, serverId])
   channelPreference ChannelPreference? @relation(fields: [serverId, channelId], references: [serverId, channelId])
 
   @@unique([messageId, userId, serverId])
   @@index([serverId, channelId])
+  @@map("images")
 }
 
 model User {
-  userId     String  @map("user_id")
-  serverId   String  @map("server_id")
-  imageCount Int     @default(0) @map("image_count")
+  userId     String     @map("user_id")
+  serverId   String     @map("server_id")
+  imageCount Int        @default(1) @map("image_count")
   username   String
   avatar     String?
-
-  images    Image[]
-  favorites Favorite[]
+  favorites  Favorite[]
+  images     Image[]
 
   @@id([userId, serverId])
   @@index([serverId])
+  @@map("users")
 }
 
 model Favorite {
@@ -51,19 +51,19 @@ model Favorite {
   messageId String   @map("message_id")
   status    Int      @default(1)
   timestamp DateTime @default(now())
+  user      User     @relation(fields: [userId, serverId], references: [userId, serverId])
+  image     Image    @relation(fields: [messageId], references: [messageId])
 
-  image Image @relation(fields: [messageId, userId, serverId], references: [messageId, userId, serverId])
-  user  User  @relation(fields: [userId, serverId], references: [userId, serverId])
-
-  @@id([userId, serverId, messageId])
+  @@unique([messageId, userId, serverId])
+  @@map("favorites")
 }
 
 model ChannelPreference {
   serverId      String   @map("server_id")
   channelId     String   @map("channel_id")
   showInGallery Boolean? @default(true) @map("show_in_gallery")
-
-  images Image[]
+  images        Image[]
 
   @@id([serverId, channelId])
+  @@map("channel_preferences")
 }

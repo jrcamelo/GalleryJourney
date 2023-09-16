@@ -19,7 +19,7 @@ const Gallery: React.FC = () => {
     const fetchData = async () => {
       try {
         if (!serverId) return null;
-        const data = await fetchGallery(serverId, { page: currentPage, sort, q: searchQuery });
+        const data = await fetchGallery(serverId, { page: currentPage, sort, search: searchQuery });
         setImages(data.records);
         setTotalPages(data.totalPages);
         setError(null);
