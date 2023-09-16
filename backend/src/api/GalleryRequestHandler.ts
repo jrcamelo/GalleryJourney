@@ -54,7 +54,7 @@ class GalleryRequestHandler {
   async getGalleryCount(where: any): Promise<number> {
     const cache = this.cache.getChainRequest(GALLERY_COUNT_KEY, where);
     if (cache) return cache;
-    const count = await this.db.getGalleryCount(where);
+    const count = await this.db.getCount(where);
     this.cache.setChainRequest(GALLERY_COUNT_KEY, where, count);
     return count;
   }
@@ -62,7 +62,7 @@ class GalleryRequestHandler {
   async getGalleryUserCounts(where: any): Promise<any> {
     const cache = this.cache.getChainRequest(GALLERY_USER_COUNTS_KEY, where);
     if (cache) return cache;
-    const counts = await this.db.getGalleryUsersCounts(where);
+    const counts = await this.db.getUsersCounts(where);
     this.cache.setChainRequest(GALLERY_USER_COUNTS_KEY, where, counts);
     return counts;
   }

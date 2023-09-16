@@ -52,7 +52,7 @@ class FavoritesRequestHandler {
   async getFavoritesCount(where: any): Promise<number> {
     const cache = this.cache.getChainRequest(FAVORITES_COUNT_KEY, where);
     if (cache) return cache;
-    const count = await this.db.getFavoritesCount(where);
+    const count = await this.db.getCount(where);
     this.cache.setChainRequest(FAVORITES_COUNT_KEY, where, count);
     return count;
   }
@@ -60,7 +60,7 @@ class FavoritesRequestHandler {
   async getFavoritesUserCounts(where: any): Promise<any> {
     const cache = this.cache.getChainRequest(FAVORITES_USER_COUNTS_KEY, where);
     if (cache) return cache;
-    const counts = await this.db.getFavoritesUsersCounts(where);
+    const counts = await this.db.getUsersCounts(where);
     this.cache.setChainRequest(FAVORITES_USER_COUNTS_KEY, where, counts);
     return counts;
   }

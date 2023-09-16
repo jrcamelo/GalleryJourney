@@ -65,15 +65,11 @@ class Database {
     });
   }
 
-  async getGalleryCount(where: any): Promise<number> {
+  async getCount(where: any): Promise<number> {
     return await this.prisma.image.count({ where });
   }
 
-  async getFavoritesCount(where: any): Promise<number> {
-    return await this.prisma.image.count({ where });
-  }
-
-  async getGalleryUsersCounts(where: any): Promise<any[]> {
+  async getUsersCounts(where: any): Promise<any[]> {
     const images = await this.prisma.image.findMany({
       where,
       select: {
@@ -101,36 +97,6 @@ class Database {
 
     const userCountsAsList = Object.values(userCounts);
     return userCountsAsList.sort((a, b) => b.item_count - a.item_count);
-  }
-
-  async getFavoritesUsersCounts(where: any): Promise<any[]> {
-    // TODO: Couldn't solve this with Prisma, groupBy does not work for this
-    const favorites = await this.prisma.image.findMany({
-      where,
-      select: {
-        user: {
-          select: {
-            username: true,
-            avatar: true
-          }
-        }
-      }
-    });
-
-    const userCounts = favorites.reduce((acc, fav) => {
-      const user = fav.user;
-      if (!acc[user.username]) {
-        acc[user.username] = {
-          item_count: 0,
-          username: user.username,
-          avatar: user.avatar
-        };
-      }
-      acc[user.username].item_count += 1;
-      return acc;
-    }, {} as { [key: string]: { item_count: number, username: string, avatar: string | null } });
-
-    return Object.values(userCounts).sort((a, b) => b.item_count - a.item_count);
   }
 }
 
