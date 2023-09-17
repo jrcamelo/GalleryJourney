@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { buildFavoritesWhere } from "../data/QueryBuilder";
 import Database from "../data/Database";
 import MemoryCache from "../data/MemoryCache";
-import { FAVORITES_COUNT_KEY, FAVORITES_KEY, FAVORITES_USER_COUNTS_KEY, ITEMS_PER_PAGE, SORT_FAVORITES, SORT_RECENT } from "../constants";
+import { FAVORITES_COUNT_KEY, FAVORITES_KEY, FAVORITES_USER_COUNTS_KEY, ITEMS_PER_PAGE, SORT_FAVORITES, SORT_RECENT } from "../Constants";
 import RequestValidator from "./RequestValidator";
 
 class FavoritesRequestHandler {

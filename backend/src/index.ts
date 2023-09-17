@@ -6,7 +6,7 @@ import cors from 'cors';
 import Database from './data/Database';
 import Cache from './data/MemoryCache';
 import RouteManager from './api/RouteManager';
-import { FRONTEND_URL, FRONTEND_URL_LOCAL, PORT } from './constants';
+import { FRONTEND_URL, FRONTEND_URL_LOCAL, PORT } from './Constants';
 
 
 const CORS_WHITELIST = [FRONTEND_URL, FRONTEND_URL_LOCAL];

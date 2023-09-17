@@ -2,7 +2,7 @@ import { query, validationResult } from "express-validator";
 import { Request, Response } from 'express';
 import Database from "../data/Database";
 import MemoryCache from "../data/MemoryCache";
-import { SORT_FAVORITES, SORT_RECENT } from "../constants";
+import { SORT_FAVORITES, SORT_RECENT } from "../Constants";
 
 class RequestValidator {
   constructor(
