@@ -3,7 +3,7 @@ import { buildGalleryWhere } from "../data/QueryBuilder";
 import Database from "../data/Database";
 import MemoryCache from "../data/MemoryCache";
 import RequestValidator from "./RequestValidator";
-import { GALLERY_COUNT_KEY, GALLERY_KEY, GALLERY_USER_COUNTS_KEY, ITEMS_PER_PAGE, SORT_FAVORITES, SORT_RECENT } from "../constants";
+import { GALLERY_COUNT_KEY, GALLERY_KEY, GALLERY_USER_COUNTS_KEY, ITEMS_PER_PAGE, SORT_FAVORITES, SORT_RECENT } from "../Constants";
 
 class GalleryRequestHandler {
   constructor(
