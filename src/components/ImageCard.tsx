@@ -15,8 +15,10 @@ interface ImageData {
   url4: string;
   timestamp: string;
   favorites_count: number;
-  username: string | null;
-  avatar: string | null;
+  user: {
+    username: string | null;
+    avatar: string | null;
+  };
 }
 
 interface Props {
@@ -36,9 +38,9 @@ const ImageCard: React.FC<Props> = ({ data }) => {
       <div className="info-container">
         <img
           className="avatar"
-          src={data.avatar || DEFAULT_DISCORD_AVATAR}
-          alt={`${data.username}'s avatar`}
-          title={`${data.username}`}
+          src={data.user.avatar || DEFAULT_DISCORD_AVATAR}
+          alt={`${data.user.username}'s avatar`}
+          title={`${data.user.username}`}
         />
         <p className="prompt">{data.prompt}</p>
       </div>
