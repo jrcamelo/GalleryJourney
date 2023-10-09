@@ -1,0 +1,47 @@
+.hidden-avatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  visibility: hidden;
+}
+
+.loading-spinner-1, .loading-spinner-2, .loading-spinner-3, .loading-spinner-4 {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+  height: 100%;
+  align-self: center;
+  justify-content: center;
+}
+
+.loading-spinner-1 {
+  animation: spin1 1s linear infinite;
+}
+.loading-spinner-2 {
+  animation: spin2 1s linear infinite;
+}
+.loading-spinner-3 {
+  animation: spin3 1s linear infinite;
+}
+.loading-spinner-4 {
+  animation: spin4 1s linear infinite;
+}
+
+@keyframes spin1 {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes spin3 {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+@keyframes spin4 {
+  0% { transform: rotate(-180deg); }
+  100% { transform: rotate(180deg); }
+}
+@keyframes spin2 {
+  0% { transform: rotate(180deg); }
+  100% { transform: rotate(-180deg); }
+}
+

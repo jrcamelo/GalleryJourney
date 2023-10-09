@@ -110,3 +110,10 @@
   -webkit-line-clamp: 2;  /* Limit text to 2 lines */
   -webkit-box-orient: vertical;
 }
+
+.no-results {
+  color: #CCC;
+  font-size: 1.5em;
+  text-align: center;
+  margin-top: 2em;
+}
