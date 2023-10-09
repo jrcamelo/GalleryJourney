@@ -1,10 +1,5 @@
-import {
-  Navigate,
-  BrowserRouter,
-  Route,
-  Routes,
-} from "react-router-dom";
-import Gallery from '../../components/Gallery';
+import { Navigate, BrowserRouter, Route, Routes } from 'react-router-dom';
+import Gallery from '../../pages/Gallery';
 import { FC } from 'react';
 
 export const AppRoutes: FC = () => {
@@ -12,7 +7,7 @@ export const AppRoutes: FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/server/:serverId" element={<Gallery />} />
-        <Route path="/" element={<Navigate to={`/server/${import.meta.env.VITE_DEFAULT_SERVER}`} replace/>} />
+        <Route path="/" element={<Navigate to={`/server/${import.meta.env.VITE_DEFAULT_SERVER}`} replace />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,25 +1,6 @@
 import React from 'react';
 import './ImageCard.css';
-
-interface ImageData {
-  message_id: string;
-  server_id: string;
-  channel_id: string;
-  user_id: string;
-  prompt: string;
-  response_id: string | null;
-  url: string;
-  url1: string;
-  url2: string;
-  url3: string;
-  url4: string;
-  timestamp: string;
-  favorites_count: number;
-  user: {
-    username: string | null;
-    avatar: string | null;
-  };
-}
+import { ImageData } from '../types/models';
 
 interface Props {
   data: ImageData;
@@ -27,20 +8,21 @@ interface Props {
 
 const DEFAULT_DISCORD_AVATAR = import.meta.env.VITE_DEFAULT_DISCORD_AVATAR;
 const ImageCard: React.FC<Props> = ({ data }) => {
+  const imageUrls = [data.url1, data.url2, data.url3, data.url4];
+
   return (
     <div className="image-card">
       <div className="image-container">
-        <img className="main-image1" src={data.url1} alt={data.prompt} />
-        <img className="main-image2" src={data.url2} alt={data.prompt} />
-        <img className="main-image3" src={data.url3} alt={data.prompt} />
-        <img className="main-image4" src={data.url4} alt={data.prompt} />
+        {imageUrls.map((url, index) => (
+          <img key={index} className={`main-image${index + 1}`} src={url} alt={`${data.prompt} ${index + 1}`} />
+        ))}
       </div>
       <div className="info-container">
         <img
           className="avatar"
-          src={data.user.avatar || DEFAULT_DISCORD_AVATAR}
-          alt={`${data.user.username}'s avatar`}
-          title={`${data.user.username}`}
+          src={data.user?.avatar || DEFAULT_DISCORD_AVATAR || ''}
+          alt={`${data.user?.username ? data.user.username : 'User'}'s avatar`}
+          title={data.user?.username || 'User'}
         />
         <p className="prompt">{data.prompt}</p>
       </div>

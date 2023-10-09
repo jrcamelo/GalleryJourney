@@ -1,12 +1,4 @@
 
-.pagination-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 1em;
-  width: 100%;
-}
-
 .pagination-button {
   background-color: #222;
   color: #FFF;
