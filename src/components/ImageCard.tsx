@@ -1,6 +1,7 @@
 import React from 'react';
 import './ImageCard.css';
 import { ImageData } from '../types/models';
+import ImageLoader from './ImageLoader';
 
 interface Props {
   data: ImageData;
@@ -14,7 +15,7 @@ const ImageCard: React.FC<Props> = ({ data }) => {
     <div className="image-card">
       <div className="image-container">
         {imageUrls.map((url, index) => (
-          <img key={index} className={`main-image${index + 1}`} src={url} alt={`${data.prompt} ${index + 1}`} />
+          <ImageLoader key={url} src={url} id={index + 1} />
         ))}
       </div>
       <div className="info-container">

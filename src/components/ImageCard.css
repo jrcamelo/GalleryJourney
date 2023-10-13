@@ -47,22 +47,22 @@
   object-fit: scale-down;
 }
 
-.main-image1 {
+.main-image1, .loading-spinner1 {
   grid-row: 1 / span 1;
   grid-column: 1 / span 1;
 }
 
-.main-image2 {
+.main-image2, .loading-spinner2 {
   grid-row: 1 / span 1;
   grid-column: 2 / span 1;
 }
 
-.main-image3 {
+.main-image3, .loading-spinner3 {
   grid-row: 2 / span 1;
   grid-column: 1 / span 1;
 }
 
-.main-image4 {
+.main-image4, .loading-spinner4 {
   grid-row: 2 / span 1;
   grid-column: 2 / span 1;
 }
