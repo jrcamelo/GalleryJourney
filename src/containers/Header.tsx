@@ -13,7 +13,7 @@ const Header: React.FC<HeaderProps> = ({ setSearchQuery, setSort, setCurrentPage
   return (
     <div className="header-container">
       <SearchBar setSearchQuery={setSearchQuery} setCurrentPage={setCurrentPage} />
-      <SortSelector setSort={setSort} />
+      <SortSelector setSort={setSort} setCurrentPage={setCurrentPage} />
     </div>
   );
 };
