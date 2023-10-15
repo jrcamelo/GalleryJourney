@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { debounce } from 'lodash';
 import './SearchBar.css';
 import SvgIcon from './SvgIcon';
 
@@ -8,29 +9,18 @@ interface SearchBarProps {
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ setSearchQuery, setCurrentPage }) => {
-  const resetPageAndSearch = (query: string | null = null) => {
+  const search = (event: any) => {
     setCurrentPage(1);
-    if (query !== null) {
-      setSearchQuery(query);
-    }
+    setSearchQuery(event.target.value);
   };
+  const handleInputChange = useCallback(debounce(search, 300), []);
 
   return (
     <div className="search-bar">
-      <input
-        type="text"
-        placeholder="Search for a prompt"
-        aria-label="Search Images"
-        onChange={e => resetPageAndSearch(e.target.value)}
-        onKeyDown={e => {
-          if (e.key === 'Enter') {
-            resetPageAndSearch(e.currentTarget.value);
-          }
-        }}
-      />
-      <button className="search-button" aria-label="Perform Search" onClick={() => resetPageAndSearch()}>
+      <button className="search-button" aria-label="Perform Search" disabled>
         <SvgIcon name="search" />
       </button>
+      <input type="text" placeholder="Search for a prompt" onChange={handleInputChange} />
     </div>
   );
 };
