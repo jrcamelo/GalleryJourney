@@ -11,8 +11,9 @@
   width: 0px; /* Allows the input to become really small */
   padding: 0.8em 1em;
   border: none;
-  border-top-left-radius: 24px;
-  border-bottom-left-radius: 24px;
+  margin-right: 1em; 
+  border-top-right-radius: 24px;
+  border-bottom-right-radius: 24px;
   background-color: #222;
   color: #FFF;
 }
@@ -25,17 +26,16 @@
 
 .search-button {
   height: max-content;
-  margin-left: 0; 
-  margin-right: 0.5em;
+  margin-right: 0;
   padding: 0.3em 0.6em;
   border: none;
-  border-top-right-radius: 24px;
-  border-bottom-right-radius: 24px;
-  border-top-left-radius: 3px;
-  border-bottom-left-radius: 3px;
+  border-top-left-radius: 24px;
+  border-bottom-left-radius: 24px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
   background-color: #222;
   color: white;
-  cursor: pointer;
+  cursor: default;
 }
 
 .icon {
@@ -43,6 +43,12 @@
   height: 1.5em;
 }
 
-.search-button:hover {
-  background-color: #555;
+@media (max-width: 680px) {
+  .search-button {
+    display: none;
+  }
+
+  .search-bar input {
+    border-radius: 24px;
+  }
 }
