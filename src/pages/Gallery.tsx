@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery } from 'react-query';
 import './Gallery.css';
 import Header from '../containers/Header';
 import Pagination from '../containers/Pagination';
@@ -13,33 +14,17 @@ const Gallery: React.FC = () => {
   const { serverId } = useParams<{ serverId: string }>();
   const serverIdOrDefault = serverId || DEFAULT_SERVER;
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const [sort, setSort] = useState(DEFAULT_SORT);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [images, setImages] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchGallery(serverIdOrDefault, { page: currentPage, sort, search: searchQuery });
-        setImages(data.records);
-        setTotalPages(data.totalPages);
-        setError(null);
-      } catch (err: any) {
-        setError(err.message || 'An error occurred.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const refetchIntervalForFirstPage = currentPage == 1 ? 30000 : false;
 
-    fetchData();
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentPage, sort, searchQuery, serverIdOrDefault]);
+  const { data, isFetching, isLoading, error } = useQuery(
+    ['gallery', serverIdOrDefault, currentPage, sort, searchQuery],
+    () => fetchGallery(serverIdOrDefault, { page: currentPage, sort, search: searchQuery }),
+    { keepPreviousData: true, refetchInterval: refetchIntervalForFirstPage },
+  );
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -48,15 +33,16 @@ const Gallery: React.FC = () => {
     if (currentPage && currentPage > 1) params.append('page', String(currentPage));
 
     navigate(`?${params.toString()}`, { replace: true });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [searchQuery, sort, currentPage, navigate]);
 
   return (
     <div className="gallery">
       <Header setSearchQuery={setSearchQuery} setSort={setSort} setCurrentPage={setCurrentPage} />
 
-      {<ImageList images={images} loading={loading} error={error} />}
+      <ImageList images={data?.records} loading={isFetching || isLoading} error={error as any} />
 
-      <Pagination currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} />
+      <Pagination currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={data?.totalPages || 1} />
     </div>
   );
 };

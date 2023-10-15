@@ -14,7 +14,7 @@ const ImageList: React.FC<Props> = ({ images, loading, error }) => {
 
   if (error) {
     content = <p className="error-message">{error}</p>;
-  } else if (!loading && images.length === 0) {
+  } else if (!images || (!loading && images.length === 0)) {
     return <div className="no-results">No results found.</div>;
   } else {
     content = images.map(image => <ImageCard key={image.message_id} data={image} />);
