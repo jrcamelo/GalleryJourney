@@ -3,7 +3,7 @@
   background-color: #222;
   color: #FFF;
   border: none;
-  padding: 0.5em 1em;
+  padding: 0.4em 0.8em;
   margin: 0 0.2em;
   cursor: pointer;
   border-radius: 4px;
@@ -19,6 +19,14 @@
   font-weight: bold;
   background-color: #555;
   color: #FFF;
+}
+
+.pagination-button--dots {
+  cursor: pointer;
+  background-color: #222;
+  color: #FFF;
+  font-size: 0.7em;
+  padding: 0.8em 0.75em;
 }
 
 .pagination-button:hover {

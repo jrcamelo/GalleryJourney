@@ -1,6 +1,7 @@
 import React from 'react';
 import './Pagination.css';
 import PageButton from '../components/PageButton';
+import PageChooserButton from '../components/PageChooserButton';
 
 interface Props {
   currentPage: number;
@@ -15,7 +16,7 @@ const Pagination: React.FC<Props> = ({ currentPage, setCurrentPage, totalPages }
 
   const pageNumbers = Array.from({ length: end - start + 1 }, (_, i) => start + i);
 
-  const renderDots = () => <span className="dots">...</span>;
+  const renderDots = () => <PageChooserButton key={'page-dots'} setCurrentPage={setCurrentPage} />;
 
   const renderPageButton = (pageNumber: number) => (
     <PageButton
